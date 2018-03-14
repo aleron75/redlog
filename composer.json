@@ -1,0 +1,30 @@
+{
+  "name": "aleron75/redlog",
+  "description": "Redmine Logger.",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Alessandro Ronchi",
+      "email": "aleron75@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Aleron75\\Redlog\\Console\\": "src/"
+    }
+  },
+  "require": {
+    "kbsali/redmine-api": "~1.5",
+    "symfony/console": "~3.0|~4.0",
+    "symfony/filesystem": "~3.0|~4.0",
+    "vlucas/phpdotenv": "~2.4"
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+    ]
+  },
+  "bin": [
+    "redlog"
+  ]
+}
