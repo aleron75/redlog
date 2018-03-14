@@ -16,7 +16,10 @@ If you prefer, create a symlink to the `redlog` script in a shared path, for exa
 
     sudo ln -s /path/to/redlog_project/redlog /usr/bin/redlog    
 
-Copy the `.env.example` file into `.env` and customize it according to your Redmine settings.
+A script that runs after `composer install` should already create an `.env` file.
+If it doesn't work, manually copy the `.env.example` file into `.env`.
+
+Then, customize `.env` file according to your Redmine settings.
 
 **Note:** customize letters of activities according to your preferences and bind them to your Reddmine's ids.
 
