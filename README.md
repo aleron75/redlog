@@ -28,6 +28,10 @@ From root directory, run the following command to track `2.5` hours for a develo
 
     redlog log 2018-03-14 2.5 1234 d "Fixed nasty bug"
 
+Alternatively you can use time start-end format:
+
+    redlog log 2018-03-14 0900-1130 1234 d "Fixed nasty bug"
+
 ## Contributing
 Contributions are very welcome; refer to the [CONTRIBUTING.md](CONTRIBUTING.md) file for further details.
 
