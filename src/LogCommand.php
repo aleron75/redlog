@@ -39,7 +39,7 @@ class LogCommand extends Command
         $hours = $input->getArgument('hours');
         
         // Calculate hours in case of hhmm-hhmm format
-        preg_match('/(\\d\\d)(\\d\\d)-(\\d\\d)(\\d\\d)/', $hours, $matches);
+        preg_match('/(\\d?\\d)(\\d\\d)-(\\d?\\d)(\\d\\d)/', $hours, $matches);
         if (5 == count($matches)) {
             $timeStart = \DateTime::createFromFormat('Hi', $matches[1] . $matches[2]);
             $timeEnd = \DateTime::createFromFormat('Hi', $matches[3] . $matches[4]);
