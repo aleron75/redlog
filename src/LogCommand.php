@@ -5,6 +5,7 @@ namespace Aleron75\Redlog\Console;
 use Dotenv\Dotenv;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -15,7 +16,6 @@ class LogCommand extends Command
     public function __construct(string $name = null)
     {
         parent::__construct($name);
-
         $dotenv = new Dotenv(__DIR__ . DIRECTORY_SEPARATOR . '..');
         $dotenv->load();
     }
@@ -30,6 +30,12 @@ class LogCommand extends Command
             ->addArgument('issue', InputArgument::REQUIRED)
             ->addArgument('activity', InputArgument::REQUIRED)
             ->addArgument('comment', InputArgument::OPTIONAL)
+            ->addOption(
+                'dryrun', 
+                'd', 
+                InputOption::VALUE_NONE, 
+                'Print command but doesn\'t perform any call.'
+            )
         ;
     }
 
@@ -44,7 +50,7 @@ class LogCommand extends Command
             $timeStart = \DateTime::createFromFormat('Hi', $matches[1] . $matches[2]);
             $timeEnd = \DateTime::createFromFormat('Hi', $matches[3] . $matches[4]);
             $timeDiff = $timeEnd->diff($timeStart);
-            $hours = $timeDiff->h + $timeDiff->i/60;
+            $hours = round($timeDiff->h + $timeDiff->i/60, 2);
         }
 
         $issue = $input->getArgument('issue');
@@ -57,6 +63,12 @@ class LogCommand extends Command
             'activity_id' => $this->getActivity($activity),
             'comments' =>  htmlspecialchars($comment),
         ];
+
+
+        if ($input->getOption('dryrun')) {
+            $output->writeln("redlog log {$date} {$hours} {$issue} {$activity} \"{$comment}\"");
+            exit;
+        }
 
         $client = new \Redmine\Client(getenv('REDMINE_API_ENDPOINT'), getenv('REDMINE_API_TOKEN'));
 
