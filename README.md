@@ -19,7 +19,7 @@ If you prefer, create a symlink to the `redlog` script in a shared path, for exa
 A script that runs after `composer install` should already create an `.env` file.
 If it doesn't work, manually copy the `.env.example` file into `.env`.
 
-Then, customize `.env` file according to your Redmine settings.
+Then, customize `.env` and `config.yml` files according to your Redmine settings.
 
 **Note:** customize letters of activities according to your preferences and bind them to your Reddmine's ids.
 
@@ -32,9 +32,24 @@ Alternatively you can use time start-end format:
 
     redlog log 2018-03-14 0900-1130 1234 d "Fixed nasty bug"
 
+If the activity is not allowed in the project the given issue belongs to,
+an error message like the following will be shown:
+
+    Activity 'a' not allowed in Project 'team-2' (id: 325)
+
+Configure the allowed activities for given project in the `config.yml` file 
+according to your Redmine settings.     
+
+Unfortunately the APIs of the version of Redmine I'm using doesn't provide the 
+activities allowed in a project, that would avoid the need of above mentioned
+configuration. 
+
 ## Contributing
 Contributions are very welcome; refer to the [CONTRIBUTING.md](CONTRIBUTING.md) file for further details.
 
+## Changelog
+All notable changes to this project are documented in the [CHANGELOG](CHANGELOG.md) file.
+
 ## Licence
-This softwre is licensed under the **Open Software License version 3.0**.
+This software is licensed under the **Open Software License version 3.0**.
 Refer to [LICENSE.txt](LICENSE.txt) file for further details.

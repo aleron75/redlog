@@ -8,19 +8,28 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Yaml\Yaml;
 
 class LogCommand extends Command
 {
-    protected $activities = [];
+    protected $client = null;
+    protected $config = [];
+    protected $projects = null;
 
     public function __construct(string $name = null)
     {
         parent::__construct($name);
+
         $dotenv = new Dotenv(__DIR__ . DIRECTORY_SEPARATOR . '..');
         $dotenv->load();
+
+        $this->client = new \Redmine\Client(getenv('REDMINE_API_ENDPOINT'), getenv('REDMINE_API_TOKEN'));
+        $this->client->setImpersonateUser(getenv('REDMINE_USER'));
+
+        $this->config = Yaml::parseFile(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'config.yml');
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('log')
@@ -54,58 +63,77 @@ class LogCommand extends Command
         }
 
         $issue = $input->getArgument('issue');
+        
+        $projectId = $this->getProjectIdByIssue($issue);
+        if ($projectId === 0) {
+            throw new \Exception("No Project found for issue '{$issue}'");
+        }
+        $projectIdentifier = $this->getProjectIdentifierById($projectId);
+        if ($projectIdentifier === null) {
+            throw new \Exception("No Identifier found for Project '{$projectId}'");
+        }
+
         $activity = $input->getArgument('activity');
+
+        // verify the activity is assigned to the project 
+        if (!in_array($activity, $this->config['project_activities'][$projectIdentifier] ?? [])) {
+            throw new \Exception("Activity '{$activity}' not allowed in Project '{$projectIdentifier}' (id: {$projectId})");
+            return;    
+        }
+        $activityId = $this->getActivity($activity);
+
         $comment = $input->getArgument('comment') ?: '';
         $data = [
             'issue_id' => $issue,
             'spent_on' => $date,
             'hours' => $hours,
-            'activity_id' => $this->getActivity($activity),
+            'activity_id' => $activityId,
             'comments' =>  htmlspecialchars($comment),
         ];
-
 
         if ($input->getOption('dryrun')) {
             $output->writeln("redlog log {$date} {$hours} {$issue} {$activity} \"{$comment}\"");
             exit;
         }
 
-        $client = new \Redmine\Client(getenv('REDMINE_API_ENDPOINT'), getenv('REDMINE_API_TOKEN'));
-
-        // impersonate user
-        $client->setImpersonateUser(getenv('REDMINE_USER'));
-
-        // create a time entry for jsmith
-        $client->time_entry->create($data);
-
-        // remove impersonation for further calls
-        $client->setImpersonateUser(null);
-
+        $this->client->time_entry->create($data);
     }
 
-    private function getActivity($activity)
+    private function getActivity(string $activity): int
     {
-        if (empty($this->activities)) {
-            $this->initActivities();
+        if (!isset($this->config['activities'][$activity])) {
+            throw new \Exception("Activity ID for '{$activity}' not found");
         }
-        if (!isset($this->activities[$activity])) {
-            throw new \Exception('Activity ID for ' . $activity . ' not found!');
-            
-        }
-        return $this->activities[$activity];
+        return (int)$this->config['activities'][$activity];
     }
 
-    private function initActivities()
+    private function getProjectIdByIssue(string $issue): int
     {
-        $activities = getenv('REDMINE_ACTIVITIES');
-        if (empty($activities)) {
-            throw new \Exception('The REDMINE_ACTIVITIES in .env file is empty');
-        }
+        $issueDetails = $this->client->issue->show($issue);
+        return (int)$issueDetails['issue']['project']['id'] ?? 0;
+    }
 
-        $activities = explode(',', $activities);
-        foreach ($activities as $kv) {
-            list($k, $v) = explode(':', $kv);
-            $this->activities[$k] = $v;
+    private function getProjectIdByIdentifier(string $identifier): int
+    {
+        if ($this->projects === null) {
+            $this->projects = [];
+            $projectsData = $this->client->project->all(['limit' => PHP_INT_MAX]);
+            foreach ($projectsData['projects'] ?? [] as $project) {
+                $this->projects[$project['identifier']] = $project['id'];    
+            }
         }
+        return (int)$this->projects[$identifier] ?? 0;
+    }
+
+    private function getProjectIdentifierById(int $id): ?string
+    {
+        if ($this->projects === null) {
+            $this->projects = [];
+            $projectsData = $this->client->project->all(['limit' => PHP_INT_MAX]);
+            foreach ($projectsData['projects'] ?? [] as $project) {
+                $this->projects[$project['id']] = $project['identifier'];    
+            }
+        }
+        return (string)$this->projects[$id] ?? null;
     }
 }

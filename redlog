@@ -7,4 +7,5 @@ if (file_exists(__DIR__.'/../../autoload.php')) {
 }
 $app = new Symfony\Component\Console\Application('Redmine Logger', '1.1.0');
 $app->add(new Aleron75\Redlog\Console\LogCommand);
+$app->add(new Aleron75\Redlog\Console\ProjectCommand);
 $app->run();
