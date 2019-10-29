@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.1] - 2019-10-29
+### Changed
+- Fixed version in CLI
+
 ## [2.0.0] - 2019-10-26
 This is a major release that breaks backward compatibility. You need to
 change `.env` and add a `config.yml` file to make it work. 
