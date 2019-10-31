@@ -37,12 +37,15 @@ an error message like the following will be shown:
 
     Activity 'a' not allowed in Project 'team-2' (id: 325)
 
-Configure the allowed activities for given project in the `config.yml` file 
-according to your Redmine settings.     
-
 Unfortunately the APIs of the version of Redmine I'm using doesn't provide the 
-activities allowed in a project, that would avoid the need of above mentioned
-configuration. 
+activities allowed in a project.
+
+If you configure a `REDMINE_SESSION` in `.env` (taken from the 
+`_redmine_session` cookie from a browser in which you are authenticated), redlog
+tries to get that list via HTTP call. 
+
+If this doesn't work, it falls back to a list of allowed activities for given 
+project configured in the `config.yml` file.     
 
 ## Contributing
 Contributions are very welcome; refer to the [CONTRIBUTING.md](CONTRIBUTING.md) file for further details.

@@ -76,9 +76,14 @@ class LogCommand extends Command
         $activity = $input->getArgument('activity');
 
         // verify the activity is assigned to the project 
-        if (!in_array($activity, $this->config['project_activities'][$projectIdentifier] ?? [])) {
-            throw new \Exception("Activity '{$activity}' not allowed in Project '{$projectIdentifier}' (id: {$projectId})");
-            return;    
+        $projectActivities = $this->getActivitiesByProjectIdentifier($projectIdentifier);    
+        if (!count($projectActivities)) {
+            $projectActivities = $this->config['project_activities'][$projectIdentifier] ?? []; 
+        }
+        if (!in_array($activity, $projectActivities)) {
+            $message = "Activity '{$activity}' not allowed in Project '{$projectIdentifier}' (id: {$projectId})";
+            $message .= PHP_EOL . $this->getProjectActivitiesUrl($projectIdentifier);
+            throw new \Exception($message);
         }
         $activityId = $this->getActivity($activity);
 
@@ -135,5 +140,57 @@ class LogCommand extends Command
             }
         }
         return (string)$this->projects[$id] ?? null;
+    }
+
+    private function getProjectActivitiesUrl(string $identifier): string
+    {
+        return sprintf(
+            "%s/projects/%s/settings/activities",
+            getenv('REDMINE_API_ENDPOINT'),
+            $identifier
+        );
+    }
+
+    private function getActivitiesByProjectIdentifier(string $identifier): array
+    {
+        $content = $this->getPageContent($this->getProjectActivitiesUrl($identifier));
+
+        if ($content === '') {
+            return [];
+        }    
+
+        $pattern = '/checked="checked" id="enumerations_(\d+)_active"/';
+        preg_match_all($pattern, $content, $matches);
+        if (!isset($matches[1])) {
+            return [];
+        }
+
+        $activitiesById = $matches[1];
+        $activities = $this->config['activities'];
+
+        $activitiesByProjectIdentifier = array_keys(array_filter(
+            $activities, 
+            function ($item) use ($activitiesById) {
+                return in_array($item, $activitiesById);
+            }
+        ));
+        return $activitiesByProjectIdentifier;
+    }
+
+    private function getPageContent(string $url): string
+    {
+        $session = getenv('REDMINE_SESSION');
+        if (!$session) {
+            return '';
+        }
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Cookie: _redmine_session=" . $session]);
+        $content = curl_exec($ch);
+        curl_close($ch);
+
+        return $content;
     }
 }

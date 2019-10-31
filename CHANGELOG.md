@@ -6,9 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2019-10-29
+### Added
+- Add HTTP call to try to get activities by project
+
 ## [2.0.1] - 2019-10-29
 ### Changed
-- Fixed version in CLI
+- Fix version in CLI
 
 ## [2.0.0] - 2019-10-26
 This is a major release that breaks backward compatibility. You need to
