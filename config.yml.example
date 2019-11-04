@@ -1,44 +1,17 @@
 activities: 
-  des: 8
-  dev: 9
-  setcon: 10
-  suptra: 11
-  a: 12
-  pm: 13
-  fed: 14
-  bed: 15
-  sup: 16
-  con: 17
-  devops: 18
-  est: 19
-  test: 20
-  evt: 41
-  tra: 42
-  sale: 440
-project_activities:
-  bitbull-internal:
-    - des
-    - setcon
-    - suptra
-    - a
-    - pm    
-  prospects:
-    - des
-    - setcon
-    - suptra
-    - a
-    - pm
-  all4cycling-accounting:
-    - des
-    - a
-    - pm
-    - fed
-    - bed
-    - sup
-    - con 
-    - devops 
-    - est 
-    - test
-    - evt
-    - tra 
-    - sale
+  des: 'Design / UX'  
+  dev: 'Development'
+  setcon: 'Setup / configuration' 
+  suptra: 'Support / training'
+  a: 'Analysis'
+  pm: 'Project management'
+  fed: 'Front-end Dev'  
+  bed: 'Back-end Dev' 
+  sup: 'Support'
+  con: 'Configuration'  
+  devops: 'Dev-Ops'
+  est: 'Estimation'
+  test: 'Test'
+  evt: 'Event'
+  tra: 'Training'
+  sale: 'Sales/Pre-sales'

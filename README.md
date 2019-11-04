@@ -21,7 +21,8 @@ If it doesn't work, manually copy the `.env.example` file into `.env`.
 
 Then, customize `.env` and `config.yml` files according to your Redmine settings.
 
-**Note:** customize letters of activities according to your preferences and bind them to your Reddmine's ids.
+**Note:** customize aliases of activities in `config.yml` according to your 
+preferences and be sure the ativity names are the same of your Redmine's.
 
 ## Usage
 From root directory, run the following command to track `2.5` hours for a development activity (d) on task `1234` done on 2018-03-14
@@ -32,20 +33,17 @@ Alternatively you can use time start-end format:
 
     redlog log 2018-03-14 0900-1130 1234 d "Fixed nasty bug"
 
-If the activity is not allowed in the project the given issue belongs to,
-an error message like the following will be shown:
+If the activity is not allowed in the issue's project, an error message like the 
+following will be shown:
 
-    Activity 'a' not allowed in Project 'team-2' (id: 325)
+    Activity 'Event' (evt) not allowed in Project 'bitbull-internal' (id: 141)
 
 Unfortunately the APIs of the version of Redmine I'm using doesn't provide the 
 activities allowed in a project.
 
-If you configure a `REDMINE_SESSION` in `.env` (taken from the 
-`_redmine_session` cookie from a browser in which you are authenticated), redlog
-tries to get that list via HTTP call. 
-
-If this doesn't work, it falls back to a list of allowed activities for given 
-project configured in the `config.yml` file.     
+Thus, configure a `REDMINE_SESSION` in `.env` (taken from the `_redmine_session` 
+cookie from a browser in which you are authenticated), so that redlog
+gets that list via HTTP call.
 
 ## Contributing
 Contributions are very welcome; refer to the [CONTRIBUTING.md](CONTRIBUTING.md) file for further details.
@@ -53,6 +51,6 @@ Contributions are very welcome; refer to the [CONTRIBUTING.md](CONTRIBUTING.md) 
 ## Changelog
 All notable changes to this project are documented in the [CHANGELOG](CHANGELOG.md) file.
 
-## Licence
+## License
 This software is licensed under the **Open Software License version 3.0**.
 Refer to [LICENSE.txt](LICENSE.txt) file for further details.

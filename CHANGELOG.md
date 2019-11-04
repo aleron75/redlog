@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] - 2019-11-04
+This is a major release that breaks backward compatibility. You need to
+`config.yml` file to make it work. 
+
+### Changed
+- Change `config.yml` format to map activity aliases
+- Change logic to retrieve allowed activities by project
+
 ## [2.1.0] - 2019-10-29
 ### Added
 - Add HTTP call to try to get activities by project

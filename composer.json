@@ -22,7 +22,8 @@
   },
   "scripts": {
     "post-install-cmd": [
-      "php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+      "php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
+      "php -r \"file_exists('config.yml.example') || copy('config.yml.example', 'config.yml');\""
     ]
   },
   "bin": [

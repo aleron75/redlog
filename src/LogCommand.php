@@ -66,26 +66,35 @@ class LogCommand extends Command
         
         $projectId = $this->getProjectIdByIssue($issue);
         if ($projectId === 0) {
-            throw new \Exception("No Project found for issue '{$issue}'");
+            $message = "No Project found for issue '{$issue}'";
+            $output->writeln($message);
+            exit(1);
         }
         $projectIdentifier = $this->getProjectIdentifierById($projectId);
         if ($projectIdentifier === null) {
-            throw new \Exception("No Identifier found for Project '{$projectId}'");
+            $message = "No Identifier found for Project '{$projectId}'";
+            $output->writeln($message);
+            exit(1);
         }
 
         $activity = $input->getArgument('activity');
+        $activityName = $this->config['activities'][$activity] ?? null;
+        if ($activityName === null) {
+            $message = "Unknown activity '{$activity}'";
+            $output->writeln($message);
+            exit(1);
+        }
 
         // verify the activity is assigned to the project 
         $projectActivities = $this->getActivitiesByProjectIdentifier($projectIdentifier);    
-        if (!count($projectActivities)) {
-            $projectActivities = $this->config['project_activities'][$projectIdentifier] ?? []; 
-        }
-        if (!in_array($activity, $projectActivities)) {
-            $message = "Activity '{$activity}' not allowed in Project '{$projectIdentifier}' (id: {$projectId})";
+
+        if (!array_key_exists($activityName, $projectActivities)) {
+            $message = "Activity '{$activityName}' ({$activity}) not allowed in Project '{$projectIdentifier}' (id: {$projectId})";
             $message .= PHP_EOL . $this->getProjectActivitiesUrl($projectIdentifier);
-            throw new \Exception($message);
+            $output->writeln($message);
+            exit(1);
         }
-        $activityId = $this->getActivity($activity);
+        $activityId = $projectActivities[$activityName];
 
         $comment = $input->getArgument('comment') ?: '';
         $data = [
@@ -102,14 +111,6 @@ class LogCommand extends Command
         }
 
         $this->client->time_entry->create($data);
-    }
-
-    private function getActivity(string $activity): int
-    {
-        if (!isset($this->config['activities'][$activity])) {
-            throw new \Exception("Activity ID for '{$activity}' not found");
-        }
-        return (int)$this->config['activities'][$activity];
     }
 
     private function getProjectIdByIssue(string $issue): int
@@ -151,30 +152,48 @@ class LogCommand extends Command
         );
     }
 
-    private function getActivitiesByProjectIdentifier(string $identifier): array
+    /**
+     * Return array of allowd activities by project in the form:
+     * [
+     *     ['Test'] => 20,
+     *     ['Event'] => 41,
+     *     ...
+     *     ['Sales/Pre-sales'] => 440,
+     * ]
+     *
+     */
+    private function getActivitiesByProjectIdentifier(string $projectIdentifier): array
     {
-        $content = $this->getPageContent($this->getProjectActivitiesUrl($identifier));
+        $content = $this->getPageContent($this->getProjectActivitiesUrl($projectIdentifier));
 
         if ($content === '') {
             return [];
         }    
 
-        $pattern = '/checked="checked" id="enumerations_(\d+)_active"/';
-        preg_match_all($pattern, $content, $matches);
-        if (!isset($matches[1])) {
-            return [];
+        $begin = strpos($content, '<form accept-charset="UTF-8" action="/projects/' . $projectIdentifier . '/enumerations"');
+        $end = strpos($content, '</form>', $begin);
+        $content = substr($content, $begin, $end - $begin);
+
+        $begin = strpos($content, '</thead>') + 8;
+        $end = strpos($content, '</table>', $begin);
+        $content = substr($content, $begin, $end - $begin);
+
+        $rows = explode('<tr', $content);
+        foreach ($rows as $row) {
+          preg_match_all("|(.*)\s+<\/td>\s+<td|", $row, $matches);
+          $name = $matches[1][0];
+          if (empty($name)) {
+            continue;
+          }
+          preg_match_all("|\"checked\" id=\"enumerations_(\d+)_active\"|", $row, $matches);
+          $id = $matches[1][0] ?? 0;
+          if (!$id) {
+            continue;
+          }
+          $activities[$id] = trim($name);
         }
 
-        $activitiesById = $matches[1];
-        $activities = $this->config['activities'];
-
-        $activitiesByProjectIdentifier = array_keys(array_filter(
-            $activities, 
-            function ($item) use ($activitiesById) {
-                return in_array($item, $activitiesById);
-            }
-        ));
-        return $activitiesByProjectIdentifier;
+        return array_flip($activities);
     }
 
     private function getPageContent(string $url): string
