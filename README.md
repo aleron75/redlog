@@ -33,10 +33,19 @@ Alternatively you can use time start-end format:
 
     redlog log 2018-03-14 0900-1130 1234 d "Fixed nasty bug"
 
-If the activity is not allowed in the issue's project, an error message like the 
+If the activity is not allowed in the issue's project, a message like the 
 following will be shown:
 
     Activity 'Event' (evt) not allowed in Project 'bitbull-internal' (id: 141)
+    https://tracker.bitbull.it/projects/bitbull-internal/settings/activities
+    The list of allowed activities is:
+    des     Design / UX
+    dev     Development
+    setcon  Setup / configuration
+    suptra  Support / training
+    a       Analysis
+    pm      Project management
+    sale    Sales/Pre-sales
 
 Unfortunately the APIs of the version of Redmine I'm using doesn't provide the 
 activities allowed in a project.

@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.0] - 2019-11-05
+### Added
+- Add printing of of allowed activities on error
+- Add extraction of app version from CHANGELOG  
+
 ## [3.0.0] - 2019-11-04
 This is a major release that breaks backward compatibility. You need to
 `config.yml` file to make it work. 

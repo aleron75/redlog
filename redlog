@@ -5,7 +5,15 @@ if (file_exists(__DIR__.'/../../autoload.php')) {
 } else {
     require __DIR__.'/vendor/autoload.php';
 }
-$app = new Symfony\Component\Console\Application('Redmine Logger', '3.0.0');
+
+$version = '';
+$changelog = file_get_contents('CHANGELOG.md');
+if ($changelog) {
+    preg_match("|\[(\d+\.\d+\.\d+)\]|", $changelog, $matches);
+    $version = $matches[1] ?? '';
+}
+
+$app = new Symfony\Component\Console\Application('Redmine Logger', $version);
 $app->add(new Aleron75\Redlog\Console\LogCommand);
 $app->add(new Aleron75\Redlog\Console\ProjectCommand);
 $app->run();

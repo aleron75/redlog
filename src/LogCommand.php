@@ -89,9 +89,14 @@ class LogCommand extends Command
         $projectActivities = $this->getActivitiesByProjectIdentifier($projectIdentifier);    
 
         if (!array_key_exists($activityName, $projectActivities)) {
-            $message = "Activity '{$activityName}' ({$activity}) not allowed in Project '{$projectIdentifier}' (id: {$projectId})";
-            $message .= PHP_EOL . $this->getProjectActivitiesUrl($projectIdentifier);
-            $output->writeln($message);
+            $output->writeln("Activity '{$activityName}' ({$activity}) not allowed in Project '{$projectIdentifier}' (id: {$projectId})");
+            $output->writeln($this->getProjectActivitiesUrl($projectIdentifier));
+            $output->writeln("The list of allowed activities is:");
+            $aliases = array_flip($this->config['activities']);
+            foreach (array_keys($projectActivities) as $i => $label) {
+                #$output->writeln(($i + 1) . ") {$label}");
+                $output->writeln($aliases[$label] . "\t" . $label);
+            }
             exit(1);
         }
         $activityId = $projectActivities[$activityName];
@@ -193,7 +198,7 @@ class LogCommand extends Command
           $activities[$id] = trim($name);
         }
 
-        return array_flip($activities);
+        return array_flip($activities ?? []);
     }
 
     private function getPageContent(string $url): string
