@@ -7,7 +7,7 @@ if (file_exists(__DIR__.'/../../autoload.php')) {
 }
 
 $version = '';
-$changelog = file_get_contents('CHANGELOG.md');
+$changelog = file_get_contents(__DIR__ .  DIRECTORY_SEPARATOR . 'CHANGELOG.md');
 if ($changelog) {
     preg_match("|\[(\d+\.\d+\.\d+)\]|", $changelog, $matches);
     $version = $matches[1] ?? '';
