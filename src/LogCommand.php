@@ -186,7 +186,7 @@ class LogCommand extends Command
         $rows = explode('<tr', $content);
         foreach ($rows as $row) {
           preg_match_all("|(.*)\s+<\/td>\s+<td|", $row, $matches);
-          $name = $matches[1][0];
+          $name = $matches[1][0] ?? '';
           if (empty($name)) {
             continue;
           }

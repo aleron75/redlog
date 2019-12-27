@@ -6,7 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [3.1.1] - 2019-11-05
+## [3.1.2] - 2019-12-27
+### Fixed
+- Fix 'undefined offset' notice
+
+## [3.1.1] - 2019-12-26
 ### Fixed
 - Fix path to read redlog's version
 
