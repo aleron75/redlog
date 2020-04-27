@@ -54,6 +54,11 @@ Thus, configure a `REDMINE_SESSION` in `.env` (taken from the `_redmine_session`
 cookie from a browser in which you are authenticated), so that redlog
 gets that list via HTTP call.
 
+### Docker image
+A Docker image [is available on Docker Hub](https://hub.docker.com/r/bitbull/redlog) , and it's built from the included Dockerfile. You can invoke the command with:
+
+    docker run -v $(pwd)/.env:/app/.env -v $(pwd)/config.yml:/app/config.yml bitbull/redlog log 2020-04-27 1000-1315 1234  d  "Fixed nasty bug"
+
 ## Contributing
 Contributions are very welcome; refer to the [CONTRIBUTING.md](CONTRIBUTING.md) file for further details.
 
